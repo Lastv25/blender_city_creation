@@ -3,7 +3,7 @@ import bpy
  
 
 class panel1(bpy.types.Panel):
-    bl_idname = "panel.RoadObjects"
+    bl_idname = "panel.Road_PT_Objects"
     bl_label = "Road Add On"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"

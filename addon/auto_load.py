@@ -152,7 +152,8 @@ class INSTALL_OT_install_dependencies(bpy.types.Operator):
 
         # Registering addon classes
         for cls in ordered_classes:
-            bpy.utils.register_class(cls)
+            if "INSTALL" not in cls.__name__:
+                bpy.utils.register_class(cls)
 
         for module in modules:
             if module.__name__ == __name__:
@@ -169,7 +170,7 @@ class INSTALL_preferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         layout.label(text='Install Dependencies:')
-        layout.operator(EXAMPLE_OT_install_dependencies.bl_idname, icon="CONSOLE")
+        layout.operator(INSTALL_OT_install_dependencies.bl_idname, icon="CONSOLE")
 
 
 __all__ = (
