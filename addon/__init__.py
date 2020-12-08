@@ -14,12 +14,12 @@
 bl_info = {
     "name" : "roads",
     "author" : "hugo",
-    "description" : "",
+    "description" : "This add on uses the overpass API trough the overpy library to download images of a city roads. Then transforms it in SVG",
     "blender" : (2, 90, 0),
     "version" : (0, 0, 1),
-    "location" : "",
-    "warning" : "",
-    "category" : "Generic"
+    "location" : "View3D > Tools > Road Add On",
+    "warning" : "Requires installation of dependencies",
+    "category" : "3D View"
 }
 
 from . import auto_load
