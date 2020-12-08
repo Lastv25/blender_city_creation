@@ -24,6 +24,17 @@ def init():
     ordered_classes = get_ordered_classes_to_register(modules)
 
 def register():
+    print('AddOn Loading')
+
+    # Registering new proptypes for the addon 
+    bpy.types.Scene.city_name = bpy.props.StringProperty \
+      (
+        name = "City Name",
+        description = "Name of the city to load",
+        default = "Melouse"
+      )
+
+    # Registering addon classes
     for cls in ordered_classes:
         bpy.utils.register_class(cls)
 
@@ -34,6 +45,12 @@ def register():
             module.register()
 
 def unregister():
+    print('Removing AddOn')
+
+    # Deleting the property fields defined for the addOn
+    del bpy.types.Scene.city_name
+
+    # Removing addon classes
     for cls in reversed(ordered_classes):
         bpy.utils.unregister_class(cls)
 

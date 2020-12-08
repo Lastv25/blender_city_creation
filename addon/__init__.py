@@ -15,7 +15,7 @@ bl_info = {
     "name" : "roads",
     "author" : "hugo",
     "description" : "",
-    "blender" : (2, 80, 0),
+    "blender" : (2, 90, 0),
     "version" : (0, 0, 1),
     "location" : "",
     "warning" : "",
@@ -23,6 +23,7 @@ bl_info = {
 }
 
 from . import auto_load
+
 
 auto_load.init()
 
