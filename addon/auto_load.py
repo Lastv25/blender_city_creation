@@ -184,22 +184,20 @@ ordered_classes = None
 def init():
     global modules
     global ordered_classes
+    global properties_classes
     global dependencies_installed
     dependencies_installed = False
 
     modules = get_all_submodules(Path(__file__).parent)
-    ordered_classes = get_ordered_classes_to_register(modules)
+    ordered_classes, properties_classes = get_ordered_classes_to_register(modules)
 
 def register():
     print('AddOn Loading')
 
-    # Registering new proptypes for the addon 
-    bpy.types.Scene.city_name = bpy.props.StringProperty \
-      (
-        name = "City Name",
-        description = "Name of the city to load",
-        default = "Melouse"
-      )
+    # Registering addon classes
+    for cls in properties_classes:
+        bpy.utils.register_class(cls)
+        bpy.types.Scene.road_tool = bpy.props.PointerProperty(type=cls)
 
     # Installing dependencies
     # Registering Pannels to enable the installation
@@ -219,7 +217,6 @@ def register():
 
     # Registering addon classes
     for cls in ordered_classes:
-        print(cls.__name__)
         if "INSTALL" not in cls.__name__:
             bpy.utils.register_class(cls)
 
@@ -232,8 +229,8 @@ def register():
 def unregister():
     print('Removing AddOn')
 
-    # Deleting the property fields defined for the addOn
-    del bpy.types.Scene.city_name
+    #Removing custom property group 
+    del bpy.types.Scene.road_tool 
 
     # Unregistering Pannels to enable the installation
     bpy.utils.unregister_class(INSTALL_PT_warning_panel)
@@ -242,6 +239,9 @@ def unregister():
 
     # Removing addon classes
     if dependencies_installed:
+        for cls in reversed(properties_classes):
+            bpy.utils.unregister_class(cls)
+
         for cls in reversed(ordered_classes):
             bpy.utils.unregister_class(cls)
 
@@ -332,15 +332,19 @@ def get_register_base_types():
 #################################################
 
 def toposort(deps_dict):
-    sorted_list = []
+    sorted_list, properties_list = [], []
     sorted_values = set()
     while len(deps_dict) > 0:
         unsorted = []
         for value, deps in deps_dict.items():
             if len(deps) == 0:
-                sorted_list.append(value)
-                sorted_values.add(value)
+                if "Property" in value.__name__:
+                    properties_list.append(value)
+                    sorted_values.add(value)
+                else:
+                    sorted_list.append(value)
+                    sorted_values.add(value)
             else:
                 unsorted.append(value)
         deps_dict = {value : deps_dict[value] - sorted_values for value in unsorted}
-    return sorted_list
+    return sorted_list, properties_list
