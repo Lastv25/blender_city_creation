@@ -50,10 +50,9 @@ def install_pip():
     directory can't be found. Therefore, PIP_REQ_TRACKER needs to be removed from environment variables.
     :return:
     """
-
     try:
         # Check if pip is already installed
-        subprocess.run([sys.executable, "-m", "pip", "--version"], check=True)
+        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "--version"], check=True)
     except subprocess.CalledProcessError:
         import ensurepip
 
@@ -89,12 +88,12 @@ def install_and_import_module(module_name, package_name=None, global_name=None):
     environ_copy = dict(os.environ)
     environ_copy["PYTHONNOUSERSITE"] = "1"
 
-    subprocess.run([sys.executable, "-m", "pip", "install", package_name], check=True, env=environ_copy)
+    subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True, env=environ_copy)
 
     # The installation succeeded, attempt to import the module again
     import_module(module_name, global_name)
 
-class EXAMPLE_PT_warning_panel(bpy.types.Panel):
+class INSTALL_PT_warning_panel(bpy.types.Panel):
     bl_label = "Road Warning"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -110,7 +109,7 @@ class EXAMPLE_PT_warning_panel(bpy.types.Panel):
                  f"1. Open the preferences (Edit > Preferences > Add-ons).",
                  f"2. Search for the road add-on.",
                  f"3. Open the details section of the add-on.",
-                 f"4. Click on the \"{EXAMPLE_OT_install_dependencies.bl_label}\" button.",
+                 f"4. Click on the \"{INSTALL_OT_install_dependencies.bl_label}\" button.",
                  f"   This will download and install the missing Python packages, if Blender has the required",
                  f"   permissions.",
                  f"If you're attempting to run the add-on from the text editor, you won't see the options described",
@@ -124,7 +123,7 @@ class EXAMPLE_PT_warning_panel(bpy.types.Panel):
             layout.label(text=line)
 
 
-class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
+class INSTALL_OT_install_dependencies(bpy.types.Operator):
     bl_idname = "example.install_dependencies"
     bl_label = "Install dependencies"
     bl_description = ("Downloads and installs the required python packages for this add-on. "
@@ -164,7 +163,7 @@ class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class EXAMPLE_preferences(bpy.types.AddonPreferences):
+class INSTALL_preferences(bpy.types.AddonPreferences):
     bl_idname = __package__
 
     def draw(self, context):
@@ -204,9 +203,9 @@ def register():
 
     # Installing dependencies
     # Registering Pannels to enable the installation
-    bpy.utils.register_class(EXAMPLE_PT_warning_panel)
-    bpy.utils.register_class(EXAMPLE_OT_install_dependencies)
-    bpy.utils.register_class(EXAMPLE_preferences)
+    bpy.utils.register_class(INSTALL_PT_warning_panel)
+    bpy.utils.register_class(INSTALL_OT_install_dependencies)
+    bpy.utils.register_class(INSTALL_preferences)
 
     # Checking to see if dependencies exist
     try:
@@ -220,7 +219,9 @@ def register():
 
     # Registering addon classes
     for cls in ordered_classes:
-        bpy.utils.register_class(cls)
+        print(cls.__name__)
+        if "INSTALL" not in cls.__name__:
+            bpy.utils.register_class(cls)
 
     for module in modules:
         if module.__name__ == __name__:
@@ -235,9 +236,9 @@ def unregister():
     del bpy.types.Scene.city_name
 
     # Unregistering Pannels to enable the installation
-    bpy.utils.unregister_class(EXAMPLE_PT_warning_panel)
-    bpy.utils.unregister_class(EXAMPLE_OT_install_dependencies)
-    bpy.utils.unregister_class(EXAMPLE_preferences)
+    bpy.utils.unregister_class(INSTALL_PT_warning_panel)
+    bpy.utils.unregister_class(INSTALL_OT_install_dependencies)
+    bpy.utils.unregister_class(INSTALL_preferences)
 
     # Removing addon classes
     if dependencies_installed:
