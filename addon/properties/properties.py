@@ -7,7 +7,7 @@ class RoadPropertyGroup(bpy.types.PropertyGroup):
     city_name: bpy.props.StringProperty(
         name = "City Name",
         description = "Name of the city to load",
-        default = "Melouse")
+        default = "Mulhouse")
     
     directory: bpy.props.StringProperty(
         name="Directory",

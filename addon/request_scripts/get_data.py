@@ -1,31 +1,27 @@
-import overpy as op
+import subprocess
+import json
+import osm2geojson
+import geojson
+import requests
 from multiprocessing import Pool
 
 
-def get_city_info(city_name):
-    print(city_name)
-    api = op.Overpass()
-    r = api.query("""<osm-script output="xml">
-                  <id-query {{nominatimArea:"""+city_name+"""}} into="area"/>
-                  <query type="way">
-                      <has-kv k="highway" regv="motorway|trunk|primary|motorway_link|trunk_link|primary_link"/>
-                      <area-query from="area"/>
-                  </query>
-                  <union>
-                    <item />
-                      <recurse type="way-node"/>   
-                  </union>
-                  <print mode="body" order="quadtile"/>
-                </osm-script>
-                    """)
-    print(len(r.nodes))
+def convert_geojson_to_svg(input_folder, output_folder):
+        subprocess.run(['svgis', 'draw', input_folder, '-o', output_folder])
 
-    coords  = []
-    coords += [(float(node.lon), float(node.lat)) 
-            for node in r.nodes]
-    coords += [(float(way.center_lon), float(way.center_lat)) 
-            for way in r.ways]
-    coords += [(float(rel.center_lon), float(rel.center_lat)) 
-            for rel in r.relations]
+def get_city_info(city_name, output_folder):
+        query= '[out:json];area[name="'+city_name+'"];(way["highway"~"motorway|trunk|primary|motorway_link|trunk_link|primary_link"](area);>;);out body qt;'
+        url = 'http://overpass-api.de/api/interpreter'  # Overpass API URL
 
-    print(coords)
+        try:
+                r = requests.get(url, params={'data': query})
+                geojson_r = osm2geojson.json2geojson(r.json())
+                with open(output_folder,mode="w+") as f:
+                        geojson.dump(geojson_r,f)
+                print('Download finished')
+                print('Conversion to svg')
+                convert_geojson_to_svg(output_folder, '/Users/hgmnjx/Desktop/test.svg')
+                print('Conversion finished')
+        except:
+                print('City not Found')
+                #print(r.content)
