@@ -37,6 +37,13 @@ class loadImage(bpy.types.Operator):
                 
             elif not context.scene.road_tool.download and context.scene.road_tool.use_file:
                 print('use existing file')
+                if os.path.isfile(context.scene.road_tool.directory):
+                    if '.svg' in context.scene.road_tool.directory:
+                        bpy.ops.import_curve.svg(filepath=context.scene.road_tool.directory)
+                    else:
+                        print('Please only use a svg file')
+                else:
+                    print('Please only use a svg file')
             else:
                 print('Only one option should be selected')
         else:

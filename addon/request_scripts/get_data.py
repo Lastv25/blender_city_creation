@@ -3,11 +3,17 @@ import json
 import osm2geojson
 import geojson
 import requests
+import os
 from multiprocessing import Pool
 
 
 def convert_geojson_to_svg(input_folder, output_folder):
-        subprocess.run(['svgis', 'draw', input_folder, '-o', output_folder])
+        root_path, input_name = os.path.split(input_folder)
+        output_folder = root_path+'/'+input_name.split('.')[0]+'.svg'
+
+        subprocess.check_output(['svgis', 'draw', input_folder, '-o', output_folder])
+
+        
 
 def get_city_info(city_name, output_folder):
         query= '[out:json];area[name="'+city_name+'"];(way["highway"~"motorway|trunk|primary|motorway_link|trunk_link|primary_link"](area);>;);out body qt;'
@@ -19,9 +25,13 @@ def get_city_info(city_name, output_folder):
                 with open(output_folder,mode="w+") as f:
                         geojson.dump(geojson_r,f)
                 print('Download finished')
+        except:
+                print('City not Found')
+                print(r.content)
+
+        try:
                 print('Conversion to svg')
                 convert_geojson_to_svg(output_folder, '/Users/hgmnjx/Desktop/test.svg')
                 print('Conversion finished')
         except:
-                print('City not Found')
-                #print(r.content)
+                print('conversion error')
