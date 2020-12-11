@@ -20,13 +20,21 @@ class panel1(bpy.types.Panel):
 
         col2 = layout.column(align=True)
         rowsub2 = col2.row(align=True)
+        rowsub2.prop(context.scene.road_tool, 'download')
         rowsub2.prop(context.scene.road_tool, 'use_file')
+        rowsub2 = col2.row(align=True)
         rowsub2 = col2.row(align=True)
 
         col3 = layout.column(align=True)
         rowsub3 = col3.row(align=True)
-        rowsub3.operator("custom.load_road_image", icon='IMAGE')
-        rowsub3 = col2.row(align=True)
+        rowsub3.prop(context.scene.road_tool, 'directory')
+        rowsub3.operator("custom.identifier_selector", icon="FILE_FOLDER", text="")
+        rowsub3 = col3.row(align=True)
+
+        col4 = layout.column(align=True)
+        rowsub4 = col4.row(align=True)
+        rowsub4.operator("custom.load_road_image", icon='IMAGE')
+        rowsub4 = col4.row(align=True)
 
         
         
